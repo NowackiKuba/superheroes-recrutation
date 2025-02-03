@@ -12,6 +12,18 @@ import { useState } from 'react';
 import { Skeleton } from './components/ui/skeleton';
 
 function App() {
+  /**
+   * Main application component that displays and manages superheroes.
+   * Features:
+   * - Display superheroes in a sorted table
+   * - Add new superheroes via modal form
+   * - Real-time updates using React Query
+   */
+
+  /**
+   * Query hook to fetch superheroes from the API
+   * Automatically handles caching and refetching
+   */
   const { data: heroes, isLoading } = useQuery({
     queryKey: ['getSuperheroes'],
     queryFn: async (): Promise<Superhero[]> => (await axios(`http://localhost:3000/superheroes`, { method: 'GET', withCredentials: true })).data,
@@ -23,6 +35,10 @@ function App() {
   const [superpower, setSuperpower] = useState<string>('');
   const [humility, setHumility] = useState<number>(0);
 
+  /**
+   * Mutation hook to create new superheroes
+   * Handles success/error states and displays toast notifications
+   */
   const { mutate: createSuperheroMutation, isPending } = useMutation({
     mutationKey: ['createSuperhero'],
     mutationFn: async (superhero: Superhero) =>
