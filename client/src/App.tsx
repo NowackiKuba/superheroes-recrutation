@@ -4,11 +4,12 @@ import axios from 'axios';
 import { Superhero } from './types';
 import { Button } from './components/ui/button';
 import { Loader2, Plus } from 'lucide-react';
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from './components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from './components/ui/dialog';
 import { Label } from './components/ui/label';
 import { Input } from './components/ui/input';
 import { useToast } from './hooks/use-toast';
 import { useState } from 'react';
+import { Skeleton } from './components/ui/skeleton';
 
 function App() {
   const { data: heroes, isLoading } = useQuery({
@@ -31,24 +32,31 @@ function App() {
       toast({
         title: 'Superhero Created',
         description: 'Your superhero has been created successfully.',
-        duration: 2000,
+        duration: 3000,
       });
       queryClient.invalidateQueries({
         queryKey: ['getSuperheroes'],
         refetchType: 'all',
       });
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: 'Superhero Creation Failed',
-        description: 'There was an error creating your superhero.',
-        duration: 2000,
+        description: error?.message ?? 'An error occurred while creating your superhero.',
+        duration: 3000,
         variant: 'destructive',
       });
     },
   });
 
-  console.log(heroes);
+  if (isLoading) {
+    return (
+      <div className='w-full h-screen py-12 text-white px-36'>
+        <Skeleton className='w-full h-[550px] rounded-3xl' />
+      </div>
+    );
+  }
+
   return (
     <div className='w-full h-screen py-12 text-white px-36'>
       <div className='w-full h-[550px] flex flex-col p-6 rounded-3xl border border-border bg-secondary shadow-md gap-4'>
@@ -75,20 +83,22 @@ function App() {
                   <Label>Humility</Label>
                   <Input type='number' onChange={(e) => setHumility(parseInt(e.target.value))} />
                 </div>
-                <Button
-                  disabled={isPending}
-                  onClick={() => {
-                    createSuperheroMutation({
-                      humility,
-                      name: heroName,
-                      superpower,
-                    });
-                  }}
-                  className='flex items-center gap-2'
-                >
-                  {isPending && <Loader2 className='w-4 h-4 animate-spin' />}
-                  Create Superhero
-                </Button>
+                <DialogClose>
+                  <Button
+                    disabled={isPending}
+                    onClick={() => {
+                      createSuperheroMutation({
+                        humility,
+                        name: heroName,
+                        superpower,
+                      });
+                    }}
+                    className='flex items-center gap-2'
+                  >
+                    {isPending && <Loader2 className='w-4 h-4 animate-spin' />}
+                    Create Superhero
+                  </Button>
+                </DialogClose>
               </div>
             </DialogContent>
           </Dialog>
